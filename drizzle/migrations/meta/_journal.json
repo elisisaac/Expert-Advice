@@ -15,6 +15,20 @@
       "when": 1762459527854,
       "tag": "0001_sudden_mephistopheles",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1762530791552,
+      "tag": "0002_harsh_titania",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1762541577403,
+      "tag": "0003_abnormal_wrecking_crew",
+      "breakpoints": true
     }
   ]
 }

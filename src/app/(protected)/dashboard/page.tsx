@@ -2,6 +2,10 @@ import { FileText, Send, DollarSign, TrendingUp } from 'lucide-react';
 import StatsCard from '@/components/dashboard/StatsCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
+export const metadata = {
+    title: 'Dashboard',
+};
+
 export default function DashboardPage() {
     const stats = [
         { label: 'Total Forms', value: '24', change: '+12%', trend: 'up' as const, icon: FileText },

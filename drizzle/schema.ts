@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp, pgEnum, jsonb, index } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, timestamp, pgEnum, jsonb, index, integer } from 'drizzle-orm/pg-core';
 
 /* ------------------- ENUMS ------------------- */
 export const subscriptionPlanEnum = pgEnum('subscription_plan', ['free', 'pro', 'enterprise']);
@@ -42,8 +42,8 @@ export const forms = pgTable(
             .notNull()
             .references(() => users.id, { onDelete: 'cascade' }),
         name: text('name').notNull(),
+        submissions: integer('submissions').default(0).notNull(),
         status: formStatusEnum('status').default('active').notNull(),
-        formLink: text('form_link').notNull().unique(),
         createdAt: timestamp('created_at').defaultNow(),
     },
     (table) => [index('forms_user_idx').on(table.userId)]

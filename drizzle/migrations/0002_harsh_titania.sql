@@ -1,0 +1,1 @@
+ALTER TABLE "forms" ADD COLUMN "submissions" integer DEFAULT 0 NOT NULL;

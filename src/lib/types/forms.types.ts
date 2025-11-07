@@ -1,8 +1,8 @@
 export interface FormType {
-    id: number;
+    id: string;
+    user_id: string;
     name: string;
     submissions: number;
     status: 'Active' | 'Completed';
-    createdAt: string;
-    link: string;
+    created_at: string;
 }
