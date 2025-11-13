@@ -6,7 +6,8 @@ export async function proxy(req: NextRequest) {
     const res = NextResponse.next();
     const supabase = await supabaseServer();
 
-    if (publicRoutes.some((path) => req.nextUrl.pathname.startsWith(path))) return res;
+    const isPublic = req.nextUrl.pathname === '/' || publicRoutes.some((path) => req.nextUrl.pathname.startsWith(path));
+    if (isPublic) return res;
 
     const {
         data: { user },
