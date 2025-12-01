@@ -64,7 +64,7 @@ export const submissions = pgTable(
 
         // File URLs
         videoUrl: text('video_url'), // uploaded by user
-        transcriptUrl: text('transcript_url'), // auto-generated after processing
+        transcript: text('transcript'), // auto-generated after processing
         jsonResultUrl: text('json_result_url'), // generated structured data
         markdownUrl: text('markdown_url'), // generated markdown summary
 

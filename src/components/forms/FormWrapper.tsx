@@ -5,10 +5,14 @@ import { useFormsStore } from '@/store/forms.store';
 import FormsTable from '@/components/forms/FormsTable';
 import CreateFormDialog from '@/components/forms/CreateFormDialog';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, FileText } from 'lucide-react';
 import { FormType } from '@/lib/types/forms.types';
 
-export default function FormWrapper({ initialForms }: { initialForms: FormType[] }) {
+interface FormWrapperProps {
+    initialForms: FormType[];
+}
+
+export default function FormWrapper({ initialForms }: FormWrapperProps) {
     const setForms = useFormsStore((s) => s.setForms);
 
     useEffect(() => {
@@ -16,19 +20,28 @@ export default function FormWrapper({ initialForms }: { initialForms: FormType[]
     }, [initialForms, setForms]);
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
+        <div className="flex flex-col p-2 gap-8 overflow-hidden">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shrink-0">
+                {/* Title and Subtitle */}
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Forms</h1>
-                    <p className="text-gray-500 mt-1">Manage and monitor all forms</p>
+                    <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-white to-gray-500">Forms</h1>
+                    <p className="text-gray-500 mt-1 flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-gray-600" />
+                        Manage and monitor all Data Intake Forms
+                    </p>
                 </div>
+
+                {/* Action Button */}
                 <CreateFormDialog>
-                    <Button className="bg-indigo-600 hover:bg-indigo-700">
+                    <Button className="w-full sm:w-auto bg-indigo-600 text-white hover:bg-indigo-500 transition-colors shadow-lg shadow-indigo-600/20 active:scale-95">
                         <Plus className="w-4 h-4 mr-2" /> Create Form
                     </Button>
                 </CreateFormDialog>
             </div>
-            <FormsTable />
+
+            <div className="flex-1 min-h-0">
+                <FormsTable />
+            </div>
         </div>
     );
 }

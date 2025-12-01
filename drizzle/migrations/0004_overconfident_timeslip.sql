@@ -1,0 +1,1 @@
+ALTER TABLE "submissions" RENAME COLUMN "transcript_url" TO "transcript";

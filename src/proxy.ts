@@ -6,7 +6,15 @@ export async function proxy(req: NextRequest) {
     const res = NextResponse.next();
     const supabase = await supabaseServer();
 
-    const isPublic = req.nextUrl.pathname === '/' || publicRoutes.some((path) => req.nextUrl.pathname.startsWith(path));
+    // Check if route is public
+    const isPublic = publicRoutes.some((path) => {
+        // For root path, match exactly or if it's a home route descendant
+        if (path === '/') {
+            return req.nextUrl.pathname === '/' || req.nextUrl.pathname.startsWith('/home');
+        }
+        return req.nextUrl.pathname.startsWith(path);
+    });
+
     if (isPublic) return res;
 
     const {
@@ -28,5 +36,14 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/((?!_next/static|_next/image|favicon.ico|auth|login|signup|api/public).*)'],
+    matcher: [
+        /*
+         * Match all request paths except for the ones starting with:
+         * - _next/static (static files)
+         * - _next/image (image optimization files)
+         * - favicon.ico (favicon file)
+         * - static files (images, etc.)
+         */
+        '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|avif)$).*)',
+    ],
 };

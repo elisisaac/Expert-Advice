@@ -1,9 +1,9 @@
 'use client';
-import { ArrowLeft, Check, Loader2 } from 'lucide-react';
+import { ArrowLeft, Check, Loader2, Mail, Phone, User, Video } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ContactMethod from './ContactMethod';
 import { CollectionFormData, HelpOption } from '@/lib/types/collection-form.types';
-import { Package, Users } from 'lucide-react';
+import { Package, Users, Info, Calendar } from 'lucide-react';
 import { ValidationErrors, validateStep3 } from '@/lib/utils/validation';
 
 interface Step3ContactProps {
@@ -33,54 +33,79 @@ export default function Step3Contact({ formData, onUpdate, onSubmit, onBack, loa
         onSubmit();
     };
 
+    const serviceLabel = helpOptions.find((h) => h.id === formData.helpType)?.label || 'N/A';
+
+    // FIX: Only use formData.phone for display if contact method is phone,
+    // as it already contains the country code from PhoneInputField.
+    const contactValue = formData.contactMethod === 'email' ? formData.email : formData.contactMethod === 'phone' ? formData.phone || 'Not provided' : 'Not selected';
+    const ContactIcon = formData.contactMethod === 'email' ? Mail : Phone;
+
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
             <div className="text-center">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">How Can We Reach You?</h2>
-                <p className="text-gray-600">Choose your preferred contact method</p>
+                <div className="inline-flex items-center justify-center p-3 rounded-full bg-indigo-500/10 border border-indigo-500/20 mb-3">
+                    <Mail className="w-6 h-6 text-indigo-400" />
+                </div>
+                <h2 className="text-2xl font-bold text-white mb-2">Step 3: Confirm & Submit</h2>
+                <p className="text-gray-400 max-w-sm mx-auto">Choose your preferred contact method and submit your request for analysis.</p>
             </div>
 
             <ContactMethod value={formData.contactMethod} onChange={(v) => onUpdate('contactMethod', v)} email={formData.email} phone={formData.phone} onEmailChange={(v) => onUpdate('email', v)} onPhoneChange={(v) => onUpdate('phone', v)} errors={errors} />
 
-            <div className="bg-linear-to-br from-indigo-50 to-indigo-100/50 border border-indigo-200 rounded-2xl p-6">
-                <div className="flex items-center gap-2 mb-4">
-                    <div className="p-1.5 bg-indigo-600 rounded-lg">
-                        <Check className="w-4 h-4 text-white" />
+            <div className="bg-white/5 border border-white/10 rounded-xl p-6">
+                <div className="flex items-center gap-3 mb-4 border-b border-white/10 pb-3">
+                    <div className="p-2 bg-green-600/20 rounded-lg">
+                        <Check className="w-4 h-4 text-green-400" />
                     </div>
-                    <h3 className="text-base font-bold text-indigo-900">Review Your Information</h3>
+                    <h3 className="text-base font-bold text-white">Review Summary</h3>
                 </div>
+
                 <div className="space-y-2.5">
-                    <div className="flex justify-between items-center py-2 border-b border-indigo-200/60">
-                        <span className="text-sm font-medium text-indigo-700">Name</span>
-                        <span className="text-sm text-indigo-900 font-semibold">
+                    <div className="flex justify-between items-center py-2 border-b border-white/10">
+                        <span className="text-sm font-medium text-gray-400 flex items-center gap-2">
+                            <User className="w-4 h-4 text-gray-500" /> Full Name
+                        </span>
+                        <span className="text-sm text-white font-semibold capitalize">
                             {formData.firstName} {formData.lastName}
                         </span>
                     </div>
-                    <div className="flex justify-between items-center py-2 border-b border-indigo-200/60">
-                        <span className="text-sm font-medium text-indigo-700">Delivery Zipcode</span>
-                        <span className="text-sm text-indigo-900 font-semibold">{formData.zipcode}</span>
+
+                    <div className="flex justify-between items-center py-2 border-b border-white/10">
+                        <span className="text-sm font-medium text-gray-400 flex items-center gap-2">
+                            <Info className="w-4 h-4 text-gray-500" /> Zipcode
+                        </span>
+                        <span className="text-sm text-white font-semibold">{formData.zipcode}</span>
                     </div>
-                    <div className="flex justify-between items-center py-2 border-b border-indigo-200/60">
-                        <span className="text-sm font-medium text-indigo-700">Service Needed</span>
-                        <span className="text-sm text-indigo-900 font-semibold">{helpOptions.find((h) => h.id === formData.helpType)?.label}</span>
+
+                    <div className="flex justify-between items-center py-2 border-b border-white/10">
+                        <span className="text-sm font-medium text-gray-400 flex items-center gap-2">
+                            <Calendar className="w-4 h-4 text-gray-500" /> Service Type
+                        </span>
+                        <span className="text-sm text-white font-semibold">{serviceLabel}</span>
                     </div>
-                    <div className="flex justify-between items-center py-2 border-b border-indigo-200/60">
-                        <span className="text-sm font-medium text-indigo-700">Video</span>
-                        <span className="text-sm text-indigo-900 font-semibold truncate max-w-[180px]">{'Uploaded'}</span>
+
+                    <div className="flex justify-between items-center py-2 border-b border-white/10">
+                        <span className="text-sm font-medium text-gray-400 flex items-center gap-2">
+                            <Video className="w-4 h-4 text-gray-500" /> Video Uploaded
+                        </span>
+                        <span className="text-sm text-green-400 font-semibold truncate max-w-[180px]">Uploaded</span>
                     </div>
-                    <div className="flex justify-between items-center py-2">
-                        <span className="text-sm font-medium text-indigo-700">Contact</span>
-                        <span className="text-sm text-indigo-900 font-semibold">{formData.contactMethod === 'email' ? formData.email : formData.phone || 'Not provided'}</span>
+
+                    <div className="flex justify-between items-center pt-2">
+                        <span className="text-sm font-medium text-gray-400 flex items-center gap-2">
+                            <ContactIcon className="w-4 h-4 text-gray-500" /> Contact Preference
+                        </span>
+                        <span className="text-sm text-indigo-400 font-semibold">{contactValue}</span>
                     </div>
                 </div>
             </div>
 
             <div className="flex gap-3 pt-4">
-                <Button variant="outline" onClick={onBack} size="lg" disabled={loading} className="px-6 border-2 hover:bg-gray-50">
+                <Button variant="outline" onClick={onBack} size="lg" disabled={loading} className="px-6 border-white/20 bg-white/5 hover:bg-white/10 text-gray-300">
                     <ArrowLeft className="mr-2 w-5 h-5" />
                     Back
                 </Button>
-                <Button onClick={handleSubmit} disabled={loading} size="lg" className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-base font-semibold shadow-lg hover:shadow-xl transition-all">
+                <Button onClick={handleSubmit} disabled={loading} size="lg" className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-base font-semibold shadow-lg shadow-indigo-600/30 transition-all active:scale-95">
                     {loading ? (
                         <>
                             <Loader2 className="mr-2 w-5 h-5 animate-spin" />
@@ -88,7 +113,7 @@ export default function Step3Contact({ formData, onUpdate, onSubmit, onBack, loa
                         </>
                     ) : (
                         <>
-                            Get Expert Advice
+                            Submit & Get Expert Advice
                             <Check className="ml-2 w-5 h-5" />
                         </>
                     )}

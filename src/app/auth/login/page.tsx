@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Mail, Lock, ArrowRight } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
 import AuthLayout from '@/components/auth/AuthLayout';
 import AuthHeader from '@/components/auth/AuthHeader';
 import InputField from '@/components/auth/InputField';
@@ -64,8 +64,8 @@ export default function LoginPage() {
                 <div>
                     <AuthHeader title="Sign In" subtitle="Welcome back! Please enter your details" linkText="Don't have an account?" linkHref="/auth/signup" />
 
-                    <div className="space-y-4">
-                        <InputField type="email" name="email" placeholder="Email Address" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} icon={Mail} validated={isEmailValid} />
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <InputField type="email" name="email" placeholder="Email Address" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} icon={Mail} validated={isEmailValid && formData.email.length > 0} />
 
                         <InputField
                             type="password"
@@ -77,29 +77,34 @@ export default function LoginPage() {
                             showPasswordToggle
                             showPassword={showPassword}
                             onTogglePassword={() => setShowPassword(!showPassword)}
+                            validated={isPasswordValid}
                         />
 
                         <div className="flex items-center justify-between pt-2 pb-2">
-                            <Button type="button" variant="link" className="text-sm text-indigo-600 hover:text-indigo-700 p-0 h-auto font-semibold" onClick={() => router.push('/auth/forgot-password')}>
+                            <Button type="button" variant="link" className="text-sm text-indigo-400 hover:text-indigo-300 p-0 h-auto font-medium" onClick={() => router.push('/auth/forgot-password')}>
                                 Forgot password?
                             </Button>
                         </div>
-                    </div>
-                </div>
 
-                <Button onClick={handleSubmit} disabled={!isFormValid || loading} className="w-full h-14 bg-indigo-600 hover:bg-indigo-700 text-white text-base font-semibold rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-indigo-600 mt-6">
-                    {loading ? (
-                        <>
-                            <span className="mr-2">Signing In...</span>
-                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        </>
-                    ) : (
-                        <>
-                            <span>Sign In</span>
-                            <ArrowRight className="w-5 h-5 ml-2" />
-                        </>
-                    )}
-                </Button>
+                        <Button
+                            type="submit"
+                            disabled={!isFormValid || loading}
+                            className="w-full h-12 bg-indigo-600 hover:bg-indigo-500 text-white text-base font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-indigo-600/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-indigo-600"
+                        >
+                            {loading ? (
+                                <>
+                                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                                    Signing In...
+                                </>
+                            ) : (
+                                <>
+                                    <span>Sign In</span>
+                                    <ArrowRight className="w-5 h-5 ml-2" />
+                                </>
+                            )}
+                        </Button>
+                    </form>
+                </div>
             </div>
         </AuthLayout>
     );

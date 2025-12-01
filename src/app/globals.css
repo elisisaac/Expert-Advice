@@ -137,32 +137,45 @@
     }
 
     /* Success Toast */
-    [data-sonner-toast][data-type="success"] {
+    [data-sonner-toast][data-type='success'] {
         @apply bg-green-50 border-green-200 text-green-900;
         border: 1px solid;
     }
 
     /* Error Toast */
-    [data-sonner-toast][data-type="error"] {
+    [data-sonner-toast][data-type='error'] {
         @apply bg-red-50 border-red-200 text-red-900;
         border: 1px solid;
     }
 
     /* Info Toast */
-    [data-sonner-toast][data-type="info"] {
+    [data-sonner-toast][data-type='info'] {
         @apply bg-blue-50 border-blue-200 text-blue-900;
         border: 1px solid;
     }
 
     /* Warning Toast */
-    [data-sonner-toast][data-type="warning"] {
+    [data-sonner-toast][data-type='warning'] {
         @apply bg-yellow-50 border-yellow-200 text-yellow-900;
         border: 1px solid;
     }
 
     /* Loading Toast */
-    [data-sonner-toast][data-type="loading"] {
+    [data-sonner-toast][data-type='loading'] {
         @apply bg-indigo-50 border-indigo-200 text-indigo-900;
         border: 1px solid;
     }
+}
+
+@keyframes bounce-slow {
+    0%,
+    100% {
+        transform: translateY(-5%);
+    }
+    50% {
+        transform: translateY(0);
+    }
+}
+.animate-bounce-slow {
+    animation: bounce-slow 2s infinite ease-in-out;
 }

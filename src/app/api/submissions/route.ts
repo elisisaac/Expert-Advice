@@ -54,6 +54,25 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Failed to save submission: ' + submissionError.message }, { status: 500 });
         }
 
+        // Trigger n8n webhook to start processing
+        try {
+            await fetch(process.env.N8N_TRANSCRIBE_URL as string, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    submissionId: submission.id,
+                    videoUrl,
+                    userId,
+                    formId,
+                    data: submissionData,
+                }),
+            });
+        } catch (err) {
+            console.error('Failed to trigger transcription workflow:', err);
+        }
+
         const { error: updateError } = await supabase.rpc('increment_form_submissions', { form_id: formId });
 
         if (updateError) {

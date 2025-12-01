@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Mail, Lock, User, ArrowRight } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
 import AuthLayout from '@/components/auth/AuthLayout';
 import AuthHeader from '@/components/auth/AuthHeader';
 import InputField from '@/components/auth/InputField';
@@ -72,7 +72,7 @@ export default function SignUpPage() {
                     <div>
                         <AuthHeader title="Sign Up" subtitle="Create your account to get started" linkText="Already have an account?" linkHref="/auth/login" />
 
-                        <div className="space-y-4">
+                        <form onSubmit={handleSubmit} className="space-y-4">
                             <InputField type="text" name="name" placeholder="Full Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} icon={User} validated={isNameValid} />
 
                             <InputField type="email" name="email" placeholder="Email Address" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} icon={Mail} validated={isEmailValid} />
@@ -104,22 +104,26 @@ export default function SignUpPage() {
                                 onTogglePassword={() => setShowConfirmPassword(!showConfirmPassword)}
                                 validated={doPasswordsMatch}
                             />
-                        </div>
-                    </div>
 
-                    <Button onClick={handleSubmit} disabled={!isFormValid || loading} className="w-full h-14 bg-indigo-600 hover:bg-indigo-700 text-white text-base font-semibold rounded-xl transition-all duration-200 mt-6 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-indigo-600">
-                        {loading ? (
-                            <>
-                                <span className="mr-2">Creating account...</span>
-                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                            </>
-                        ) : (
-                            <>
-                                <span>Sign Up</span>
-                                <ArrowRight className="w-5 h-5 ml-2" />
-                            </>
-                        )}
-                    </Button>
+                            <Button
+                                type="submit"
+                                disabled={!isFormValid || loading}
+                                className="w-full h-12 bg-indigo-600 hover:bg-indigo-500 text-white text-base font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-indigo-600/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-indigo-600 mt-6"
+                            >
+                                {loading ? (
+                                    <>
+                                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                                        Creating account...
+                                    </>
+                                ) : (
+                                    <>
+                                        <span>Sign Up</span>
+                                        <ArrowRight className="w-5 h-5 ml-2" />
+                                    </>
+                                )}
+                            </Button>
+                        </form>
+                    </div>
                 </div>
             )}
         </AuthLayout>

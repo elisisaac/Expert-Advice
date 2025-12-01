@@ -1,4 +1,3 @@
-'use client';
 import React from 'react';
 import { AlertCircle, XCircle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -17,21 +16,21 @@ interface StatusMessageProps {
 const statusConfig = {
     error: {
         icon: XCircle,
-        bgColor: 'bg-red-50',
-        borderColor: 'border-red-100',
-        iconBg: 'bg-red-100',
-        iconColor: 'text-red-500',
-        headingColor: 'text-red-900',
-        contentColor: 'text-red-700',
+        bgColor: 'bg-red-950/20',
+        borderColor: 'border-red-600/50',
+        iconBg: 'bg-red-800/30',
+        iconColor: 'text-red-400',
+        headingColor: 'text-white',
+        contentColor: 'text-red-300',
     },
     'not-found': {
         icon: AlertCircle,
-        bgColor: 'bg-indigo-50',
-        borderColor: 'border-indigo-100',
-        iconBg: 'bg-indigo-100',
-        iconColor: 'text-indigo-600',
-        headingColor: 'text-indigo-900',
-        contentColor: 'text-indigo-700',
+        bgColor: 'bg-white/5',
+        borderColor: 'border-indigo-600/30',
+        iconBg: 'bg-indigo-600/20',
+        iconColor: 'text-indigo-400',
+        headingColor: 'text-white',
+        contentColor: 'text-gray-400',
     },
 };
 
@@ -41,9 +40,9 @@ export function StatusMessage({ type = 'error', heading, content, className, act
 
     return (
         <div className={cn('flex items-center justify-center p-6', className)}>
-            <Card className={cn('w-full max-w-md rounded-2xl border shadow-sm transition-all hover:shadow-lg hover:border-opacity-60', config.bgColor, config.borderColor)}>
+            <Card className={cn('w-full max-w-md rounded-2xl border transition-all hover:shadow-xl hover:border-opacity-60 shadow-none', config.bgColor, config.borderColor)}>
                 <CardContent className="pt-8 pb-6 px-6 flex flex-col items-center text-center">
-                    <div className={cn('rounded-full p-4 mb-5 flex items-center justify-center shadow-sm', config.iconBg)}>
+                    <div className={cn('rounded-full p-4 mb-5 flex items-center justify-center shadow-xl', config.iconBg)}>
                         <Icon className={cn('h-10 w-10', config.iconColor)} />
                     </div>
 

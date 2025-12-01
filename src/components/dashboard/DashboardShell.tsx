@@ -24,7 +24,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
     if (!mounted) return null;
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-[#030303]">
             <Sidebar isCollapsed={isCollapsed} onToggle={handleToggle} />
             <DashboardHeader isCollapsed={isCollapsed} onToggle={handleToggle} />
             <main className={`min-h-screen pt-[73px] transition-all duration-300 ${isCollapsed ? 'lg:ml-20' : 'lg:ml-64'}`}>

@@ -50,21 +50,21 @@ export default function DashboardHeader({ isCollapsed, onToggle }: DashboardHead
     };
 
     return (
-        <header className={cn('fixed top-0 right-0 z-30 bg-white border-b border-gray-100 transition-all duration-300', isCollapsed ? 'lg:left-20' : 'lg:left-64', 'left-0')}>
-            <div className="px-4 py-3 lg:px-2">
+        <header className={cn('fixed top-0 right-0 z-30 bg-[#0A0A0A] border-b border-white/10 transition-all duration-300', isCollapsed ? 'lg:left-20' : 'lg:left-64', 'left-0')}>
+            <div className="px-4 py-3 lg:px-6">
                 <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-3 flex-1">
-                        <Button variant="ghost" size="icon" className="shrink-0" onClick={onToggle}>
+                        <Button variant="ghost" size="icon" className="shrink-0 text-gray-400 hover:bg-white/5 hover:text-white" onClick={onToggle}>
                             {isCollapsed ? <PanelLeft className="w-5 h-5" /> : <PanelLeftClose className="w-5 h-5" />}
                         </Button>
-                        <h1 className="text-lg sm:text-2xl font-bold truncate">Dashboard</h1>
+                        <h1 className="text-lg sm:text-2xl font-bold truncate bg-clip-text text-transparent bg-linear-to-r from-white to-gray-400">Dashboard</h1>
                     </div>
 
                     <div className="flex items-center h-10">
                         {isLoading ? (
                             <div className="flex items-center gap-2 px-2">
-                                <Skeleton className="h-8 w-8 sm:h-10 sm:w-10 rounded-full" />
-                                <Skeleton className="h-4 w-4 rounded-sm hidden sm:block" />
+                                <Skeleton className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-white/10" />
+                                <Skeleton className="h-4 w-16 rounded-sm hidden sm:block bg-white/10" />
                             </div>
                         ) : (
                             user && <UserDropdown user={user} onLogout={handleLogout} />

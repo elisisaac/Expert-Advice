@@ -18,8 +18,8 @@ interface ContactMethodProps {
 }
 
 const contactOptions: ContactOption[] = [
-    { id: 'email', label: 'Email', icon: Mail, desc: 'Get quote via email' },
-    { id: 'phone', label: 'Phone', icon: PhoneIcon, desc: "We'll call you back" },
+    { id: 'email', label: 'Email', icon: Mail, desc: 'Receive quote and updates via email' },
+    { id: 'phone', label: 'Phone', icon: PhoneIcon, desc: "We'll call you back with next steps" },
 ];
 
 export default function ContactMethod({ value, onChange, email, phone, onEmailChange, onPhoneChange, errors }: ContactMethodProps) {
@@ -27,32 +27,39 @@ export default function ContactMethod({ value, onChange, email, phone, onEmailCh
         onPhoneChange(val || '');
     };
 
+    const hasMethodError = !!errors.contactMethod;
+    const isEmailError = value === 'email' && !!errors.email;
+    const isPhoneError = value === 'phone' && !!errors.phone;
+
+    const inputClasses = (isError: boolean) =>
+        `h-11 text-base bg-white/5 border text-white placeholder:text-gray-600 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-0 transition-colors ${isError ? 'border-red-500 ring-red-500' : 'border-white/10 focus:border-indigo-500/50'}`;
+
     return (
         <div className="space-y-4">
-            <div className="grid grid-cols-1 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {contactOptions.map((option) => {
                     const Icon = option.icon;
                     const isSelected = value === option.id;
+
                     return (
                         <button
                             key={option.id}
                             type="button"
                             onClick={() => onChange(option.id)}
-                            className={`relative p-4 rounded-xl border-2 transition-all duration-200 text-left group ${
-                                isSelected ? 'border-indigo-600 bg-indigo-50 shadow-sm' : errors.contactMethod ? 'border-red-300 bg-white hover:border-red-400' : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
-                            }`}
+                            className={`relative p-4 rounded-xl border-2 transition-all duration-200 text-left group
+                                ${isSelected ? 'border-indigo-500 bg-indigo-600/10 shadow-md shadow-indigo-900/30' : hasMethodError ? 'border-red-500/50 bg-red-950/10 hover:border-red-500/70' : 'border-white/10 bg-white/5 hover:border-indigo-500/20 hover:bg-white/10'}`}
                         >
-                            <div className="flex items-center gap-3">
-                                <div className={`p-2.5 rounded-lg transition-colors ${isSelected ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200'}`}>
+                            <div className="flex items-center gap-4">
+                                <div className={`p-3 rounded-lg transition-colors shadow-sm ${isSelected ? 'bg-indigo-600 text-white' : 'bg-white/10 text-gray-400 group-hover:bg-white/20'}`}>
                                     <Icon className="w-5 h-5" />
                                 </div>
                                 <div className="flex-1">
-                                    <div className={`font-semibold text-sm mb-0.5 ${isSelected ? 'text-indigo-900' : 'text-gray-900'}`}>{option.label}</div>
-                                    <div className={`text-xs ${isSelected ? 'text-indigo-700' : 'text-gray-500'}`}>{option.desc}</div>
+                                    <div className={`font-semibold text-base mb-0.5 ${isSelected ? 'text-white' : 'text-gray-200'}`}>{option.label}</div>
+                                    <div className={`text-xs ${isSelected ? 'text-indigo-300' : 'text-gray-500'}`}>{option.desc}</div>
                                 </div>
                                 {isSelected && (
                                     <div className="shrink-0">
-                                        <div className="w-5 h-5 bg-indigo-600 rounded-full flex items-center justify-center">
+                                        <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center shadow-md">
                                             <Check className="w-3 h-3 text-white" />
                                         </div>
                                     </div>
@@ -62,21 +69,22 @@ export default function ContactMethod({ value, onChange, email, phone, onEmailCh
                     );
                 })}
             </div>
-            {errors.contactMethod && <p className="text-xs text-red-600 mt-1">{errors.contactMethod}</p>}
+            {errors.contactMethod && <p className="text-xs text-red-500 mt-1">{errors.contactMethod}</p>}
 
             {value === 'email' && (
                 <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                    <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                    <Label htmlFor="email" className="text-sm font-medium text-gray-300">
                         Email Address <span className="text-red-500">*</span>
                     </Label>
-                    <Input id="email" type="email" value={email} onChange={(e) => onEmailChange(e.target.value)} placeholder="you@example.com" className={`h-11 text-base ${errors.email ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-indigo-500'}`} />
-                    {errors.email && <p className="text-xs text-red-600 mt-1">{errors.email}</p>}
+                    <Input id="email" type="email" value={email} onChange={(e) => onEmailChange(e.target.value)} placeholder="you@example.com" className={inputClasses(isEmailError)} />
+                    {isEmailError && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
                 </div>
             )}
 
             {value === 'phone' && (
                 <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                     <PhoneInputField value={phone as Value} onChange={handlePhoneChange} error={errors.phone} />
+                    {isPhoneError && <p className="text-xs text-red-500 mt-1">{errors.phone}</p>}
                 </div>
             )}
         </div>

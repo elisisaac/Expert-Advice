@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Mail, ArrowRight } from 'lucide-react';
+import { Mail, ArrowRight, Loader2 } from 'lucide-react';
 import AuthLayout from '@/components/auth/AuthLayout';
 import AuthHeader from '@/components/auth/AuthHeader';
 import InputField from '@/components/auth/InputField';
@@ -54,27 +54,31 @@ export default function ForgotPasswordPage() {
                 <PasswordResetEmailSuccess email={email} />
             ) : (
                 <div className="flex flex-col h-full justify-between min-h-[500px]">
-                    <div>
+                    <form onSubmit={handleReset}>
                         <AuthHeader title="Forgot Password" subtitle="Enter your email and we'll send you a reset link" linkText="Remember your password?" linkHref="/auth/login" />
 
                         <div className="space-y-4">
-                            <InputField type="email" name="email" placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} icon={Mail} validated={isEmailValid} />
+                            <InputField type="email" name="email" placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} icon={Mail} validated={isEmailValid && email.length > 0} />
                         </div>
-                    </div>
 
-                    <Button onClick={handleReset} disabled={!isEmailValid || loading} className="w-full h-14 bg-indigo-600 hover:bg-indigo-700 text-white text-base font-semibold rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-indigo-600 mt-6">
-                        {loading ? (
-                            <>
-                                <span className="mr-2">Sending...</span>
-                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                            </>
-                        ) : (
-                            <>
-                                <span>Send Reset Link</span>
-                                <ArrowRight className="w-5 h-5 ml-2" />
-                            </>
-                        )}
-                    </Button>
+                        <Button
+                            type="submit"
+                            disabled={!isEmailValid || loading}
+                            className="w-full h-12 bg-indigo-600 hover:bg-indigo-500 text-white text-base font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-indigo-600/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-indigo-600 mt-6"
+                        >
+                            {loading ? (
+                                <>
+                                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                                    Sending...
+                                </>
+                            ) : (
+                                <>
+                                    <span>Send Reset Link</span>
+                                    <ArrowRight className="w-5 h-5 ml-2" />
+                                </>
+                            )}
+                        </Button>
+                    </form>
                 </div>
             )}
         </AuthLayout>

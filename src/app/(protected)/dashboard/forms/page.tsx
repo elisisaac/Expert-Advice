@@ -2,7 +2,7 @@ import { supabaseServer } from '@/supabase/server';
 import FormWrapper from '@/components/forms/FormWrapper';
 
 export const metadata = {
-    title: 'Forms',
+    title: 'Forms | Box Rentail Now',
 };
 
 export default async function FormsPage() {

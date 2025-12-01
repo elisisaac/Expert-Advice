@@ -1,5 +1,5 @@
 'use client';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Video, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import VideoUploader from './VideoUploader';
 import { CollectionFormData } from '@/lib/types/collection-form.types';
@@ -25,14 +25,19 @@ export default function Step1Video({ formData, onUpdate, onNext, errors, setErro
         onNext();
     };
 
+    const isVideoReady = formData.videoUrl && !formData.videoUploading;
+
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
+        <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-300">
             <div className="text-center">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Upload Your Video</h2>
-                <p className="text-gray-600">Share a quick video to help us understand your needs</p>
+                <div className="inline-flex items-center justify-center p-3 rounded-full bg-indigo-500/10 border border-indigo-500/20 mb-3">
+                    <Video className="w-6 h-6 text-indigo-400" />
+                </div>
+                <h2 className="text-2xl font-bold text-white mb-2">Step 1: Upload Video Evidence</h2>
+                <p className="text-gray-400 max-w-sm mx-auto">A quick video helps our AI analyze damage, dimensions, or details instantly.</p>
             </div>
 
-            <div>
+            <div className="space-y-4">
                 <VideoUploader
                     videoUrl={formData.videoUrl}
                     isUploading={formData.videoUploading}
@@ -44,12 +49,30 @@ export default function Step1Video({ formData, onUpdate, onNext, errors, setErro
                     onUploadError={() => onUpdate('videoUploading', false)}
                     formId={formId}
                 />
-                {errors.videoUrl && <p className="text-xs text-red-600 mt-2">{errors.videoUrl}</p>}
+
+                {errors.videoUrl && (
+                    <div className="flex items-center justify-center text-sm">
+                        <p className="text-sm font-medium text-red-500 bg-red-950/20 border border-red-500/20 rounded-lg px-4 py-2 mt-2 w-fit">{errors.videoUrl}</p>
+                    </div>
+                )}
             </div>
 
-            <div className="flex justify-end pt-4">
-                <Button onClick={handleNext} disabled={formData.videoUploading || !formData.videoUrl} size="lg" className="bg-indigo-600 hover:bg-indigo-700 px-8 text-base font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                    Continue
+            <div className="space-y-4">
+                <div className="flex items-center justify-between text-gray-500">
+                    <div className="text-sm font-medium">Video Status:</div>
+                    <div className="flex items-center gap-2">
+                        {formData.videoUploading && <span className="text-yellow-400 text-sm animate-pulse">Processing...</span>}
+                        {isVideoReady && (
+                            <span className="text-green-400 text-sm flex items-center gap-1">
+                                <FileText className="w-4 h-4" /> Ready for Analysis
+                            </span>
+                        )}
+                        {!formData.videoUrl && !formData.videoUploading && <span className="text-gray-500 text-sm">Awaiting Upload</span>}
+                    </div>
+                </div>
+
+                <Button onClick={handleNext} disabled={formData.videoUploading || !formData.videoUrl} size="lg" className="w-full bg-indigo-600 hover:bg-indigo-500 px-8 text-base font-semibold shadow-lg shadow-indigo-600/30 transition-all active:scale-95 disabled:opacity-50 disabled:shadow-none">
+                    Continue to Details
                     <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
             </div>

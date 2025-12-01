@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Lock, ArrowRight } from 'lucide-react';
+import { Lock, ArrowRight, Loader2 } from 'lucide-react';
 import AuthLayout from '@/components/auth/AuthLayout';
 import AuthHeader from '@/components/auth/AuthHeader';
 import InputField from '@/components/auth/InputField';
@@ -68,7 +68,7 @@ export default function UpdatePasswordPage() {
                 <PasswordUpdateSuccess />
             ) : (
                 <div className="flex flex-col h-full justify-between min-h-[500px]">
-                    <div>
+                    <form onSubmit={handleUpdate}>
                         <AuthHeader title="Update Password" subtitle="Enter your new password below" linkText="Back to sign in" linkHref="/auth/login" />
 
                         <div className="space-y-4">
@@ -100,21 +100,25 @@ export default function UpdatePasswordPage() {
                                 validated={doPasswordsMatch}
                             />
                         </div>
-                    </div>
 
-                    <Button onClick={handleUpdate} disabled={!isFormValid || loading} className="w-full h-14 bg-indigo-600 hover:bg-indigo-700 text-white text-base font-semibold rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-indigo-600 mt-6">
-                        {loading ? (
-                            <>
-                                <span className="mr-2">Updating...</span>
-                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                            </>
-                        ) : (
-                            <>
-                                <span>Update Password</span>
-                                <ArrowRight className="w-5 h-5 ml-2" />
-                            </>
-                        )}
-                    </Button>
+                        <Button
+                            type="submit"
+                            disabled={!isFormValid || loading}
+                            className="w-full h-12 bg-indigo-600 hover:bg-indigo-500 text-white text-base font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-indigo-600/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-indigo-600 mt-6"
+                        >
+                            {loading ? (
+                                <>
+                                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                                    Updating...
+                                </>
+                            ) : (
+                                <>
+                                    <span>Update Password</span>
+                                    <ArrowRight className="w-5 h-5 ml-2" />
+                                </>
+                            )}
+                        </Button>
+                    </form>
                 </div>
             )}
         </AuthLayout>
