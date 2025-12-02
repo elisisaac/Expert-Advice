@@ -67,7 +67,6 @@ export default function SubmissionsTable({ search = '' }: SubmissionsTableProps)
             return newSet;
         });
     };
-    console.log(submissions);
 
     return (
         <Card className="bg-[#0A0A0A] border border-white/10 shadow-xl shadow-black/20 flex flex-col flex-1">

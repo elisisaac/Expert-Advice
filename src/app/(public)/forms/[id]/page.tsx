@@ -20,7 +20,9 @@ const PageWrapper = ({ children }: { children: React.ReactNode }) => (
             <div className="flex justify-center mb-8">
                 <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm">
                     <Ghost className="w-5 h-5 text-indigo-400" />
-                    <span className="font-bold text-white tracking-tight">FormFlow</span>
+                    <span className="font-bold text-white tracking-tight">
+                        Box <span className="text-indigo-400">Rental</span> Now
+                    </span>
                 </div>
             </div>
 
