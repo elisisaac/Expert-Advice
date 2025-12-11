@@ -75,7 +75,7 @@ export default function Sidebar({ isCollapsed, onToggle }: { isCollapsed: boolea
                     <div className="mt-auto space-y-2 pt-4 border-t border-sidebar-border">
                         {bottomItems.map((item) =>
                             item.onClick ? (
-                                <button key={item.label} onClick={item.onClick} className={cn('flex w-full items-center gap-3 p-3 rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors group relative', isCollapsed && 'justify-center')}>
+                                <button key={item.label} onClick={item.onClick} className={cn('flex w-full items-center gap-3 p-3 rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors group relative cursor-pointer', isCollapsed && 'justify-center')}>
                                     <item.icon className="w-5 h-5 shrink-0" />
                                     {!isCollapsed && <span className="font-medium whitespace-nowrap transition-opacity duration-200">{item.label}</span>}
                                     {isCollapsed && <div className="absolute left-full ml-4 px-2 py-1 bg-popover text-popover-foreground text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50 border border-border shadow-md">{item.label}</div>}
