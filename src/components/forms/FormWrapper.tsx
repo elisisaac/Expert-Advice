@@ -30,7 +30,6 @@ export default function FormWrapper({ initialForms }: FormWrapperProps) {
                         Manage and monitor all Data Intake Forms
                     </p>
                 </div>
-
                 {/* Action Button */}
                 <CreateFormDialog>
                     <Button className="w-full sm:w-auto bg-indigo-600 text-white hover:bg-indigo-500 transition-colors shadow-lg shadow-indigo-600/20 active:scale-95">
