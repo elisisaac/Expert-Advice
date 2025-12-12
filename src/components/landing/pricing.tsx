@@ -17,14 +17,14 @@ const YEARLY_DISCOUNT_PERCENT = parseInt(process.env.NEXT_PUBLIC_YEARLY_DISCOUNT
 const plans: Plan[] = [
     {
         name: 'Go Plan',
-        price: { monthly: 9 },
+        price: { monthly: 27 },
         description: 'Essential tools for individuals and small teams to explore features.',
         features: ['5 active forms', '20 form submissions', '2 hours of audio transcription', '10 GB storage', 'Standard support'],
         notIncluded: ['Video Intelligence'],
     },
     {
         name: 'Pro Plan',
-        price: { monthly: 49 },
+        price: { monthly: 69 },
         description: 'Unlock unlimited potential and advanced intelligence.',
         popular: true,
         features: ['Unlimited active forms', 'Unlimited submissions', '10 hours of audio transcription', '5 hours of video intelligence', '50 GB storage', 'Priority support'],
