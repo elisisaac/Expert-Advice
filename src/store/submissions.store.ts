@@ -69,12 +69,9 @@ export const useSubmissionsStore = create<SubmissionsState>((set) => ({
             // Wait for all file deletions (don't fail if some files are missing)
             await Promise.allSettled(deletePromises);
 
-            // Delete the submission record from database
-            const { error: dbError } = await supabaseClient.from('submissions').delete().eq('id', id);
-
-            if (dbError) {
-                throw new Error(`Failed to delete submission: ${dbError.message}`);
-            }
+            // Call API instead of direct database access - prevents IDOR vulnerability
+            const res = await fetch(`/api/submissions?id=${id}`, { method: 'DELETE' });
+            if (!res.ok) throw new Error('Failed to delete submission');
 
             // Update state
             set((state) => ({
@@ -114,12 +111,13 @@ export const useSubmissionsStore = create<SubmissionsState>((set) => ({
                 await Promise.allSettled(deletePromises);
             }
 
-            // Delete all submission records from database
-            const { error: dbError } = await supabaseClient.from('submissions').delete().in('id', ids);
-
-            if (dbError) {
-                throw new Error(`Failed to delete submissions: ${dbError.message}`);
-            }
+            // Call API instead of direct database access - prevents IDOR vulnerability
+            const res = await fetch('/api/submissions', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ids }),
+            });
+            if (!res.ok) throw new Error('Failed to delete submissions');
 
             // Update state
             set((state) => ({

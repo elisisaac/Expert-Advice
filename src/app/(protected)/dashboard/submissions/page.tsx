@@ -8,7 +8,13 @@ export const metadata = {
 
 export default async function SubmissionsPage() {
     const supabase = await supabaseServer();
-    const { data: submissionsRaw } = await supabase.from('submissions').select('*').order('created_at', { ascending: false });
+    const { data: { user } } = await supabase.auth.getUser();
+
+    const { data: submissionsRaw } = await supabase
+        .from('submissions')
+        .select('*')
+        .eq('user_id', user!.id)
+        .order('created_at', { ascending: false });
 
     const submissions: SubmissionDisplayData[] = (submissionsRaw || []).map((row: SubmissionRow) => ({
         id: row.id,

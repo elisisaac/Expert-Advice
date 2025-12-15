@@ -85,3 +85,42 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
+
+export async function DELETE(req: Request) {
+    try {
+        const supabase = await supabaseServer();
+        const url = new URL(req.url);
+        const id = url.searchParams.get('id');
+
+        let ids: string[] | undefined;
+        try {
+            const body = await req.json().catch(() => ({}));
+            if (Array.isArray(body?.ids)) ids = body.ids;
+        } catch {
+            // ignore
+        }
+
+        if (!id && (!ids || !ids.length)) {
+            return NextResponse.json({ error: 'No submission ID(s) provided' }, { status: 400 });
+        }
+
+        const { data: user } = await supabase.auth.getUser();
+        const userId = user?.user?.id;
+        if (!userId) return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 });
+
+        const deleteIds = ids?.length ? ids : [id!];
+
+        // CRITICAL: Verify ownership before deletion - prevents IDOR vulnerability
+        const { error } = await supabase
+            .from('submissions')
+            .delete()
+            .in('id', deleteIds)
+            .eq('user_id', userId);
+
+        if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+        return NextResponse.json({ success: true, deleted: deleteIds });
+    } catch (error: any) {
+        console.error('Delete submissions error:', error);
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    }
+}
