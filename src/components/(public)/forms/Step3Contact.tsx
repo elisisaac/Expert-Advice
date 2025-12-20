@@ -46,13 +46,7 @@ export default function Step3Contact({ formData, onUpdate, onSubmit, onBack, loa
                 <p className="text-muted-foreground max-w-sm mx-auto">Zero spam, We are actual people and here to help!</p>
             </div>
 
-            <ContactMethod
-                email={formData.email}
-                phone={formData.phone}
-                onEmailChange={(v) => onUpdate('email', v)}
-                onPhoneChange={(v) => onUpdate('phone', v)}
-                errors={errors}
-            />
+            <ContactMethod email={formData.email} phone={formData.phone} onEmailChange={(v) => onUpdate('email', v)} onPhoneChange={(v) => onUpdate('phone', v)} errors={errors} />
 
             <div className="bg-muted/30 border border-border rounded-xl p-6">
                 <div className="flex items-center gap-3 mb-4 border-b border-border pb-3">

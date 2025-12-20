@@ -114,7 +114,7 @@ export async function DELETE(req: Request) {
         try {
             const body = await req.json().catch(() => ({}));
             if (Array.isArray(body?.ids)) ids = body.ids;
-        } catch { }
+        } catch {}
 
         if (!id && (!ids || !ids.length)) {
             return NextResponse.json({ error: 'No submission ID(s) provided' }, { status: 400 });
@@ -127,11 +127,7 @@ export async function DELETE(req: Request) {
         const deleteIds = ids?.length ? ids : [id!];
 
         // Fetch submissions with file paths and sizes
-        const { data: submissions } = await supabase
-            .from('submissions')
-            .select('id, video_url_path, json_result_url_path, markdown_url_path, files_size')
-            .in('id', deleteIds)
-            .eq('user_id', userId);
+        const { data: submissions } = await supabase.from('submissions').select('id, video_url_path, json_result_url_path, markdown_url_path, files_size').in('id', deleteIds).eq('user_id', userId);
 
         if (!submissions || submissions.length === 0) {
             return NextResponse.json({ error: 'No submissions found' }, { status: 404 });
@@ -185,7 +181,7 @@ export async function DELETE(req: Request) {
             success: true,
             deleted: deleteIds.length,
             filesDeleted: filesToDelete.length,
-            storageFreed: totalBytes
+            storageFreed: totalBytes,
         });
     } catch (error: any) {
         console.error('Delete submissions error:', error);

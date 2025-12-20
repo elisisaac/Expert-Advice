@@ -23,8 +23,7 @@ const PageWrapper = ({ children }: { children: React.ReactNode }) => (
                         <Ghost className="w-8 h-8 text-indigo-500" />
                     </div>
                     <h2 className="text-lg font-bold tracking-tight">
-                        <span className='text-muted-foreground font-light'>Powered by</span>{' '}
-                        Advice<span className="text-indigo-500">Expert</span>.io
+                        <span className="text-muted-foreground font-light">Powered by</span> Advice<span className="text-indigo-500">Expert</span>.io
                     </h2>
                 </div>
             </div>

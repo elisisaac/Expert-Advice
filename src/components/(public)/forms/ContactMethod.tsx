@@ -42,14 +42,7 @@ export default function ContactMethod({ email, phone, onEmailChange, onPhoneChan
                         <Mail className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
                         Email Address
                     </Label>
-                    <Input
-                        id="email"
-                        type="email"
-                        value={email}
-                        onChange={(e) => onEmailChange(e.target.value)}
-                        placeholder="you@example.com"
-                        className={inputClasses(isEmailError)}
-                    />
+                    <Input id="email" type="email" value={email} onChange={(e) => onEmailChange(e.target.value)} placeholder="you@example.com" className={inputClasses(isEmailError)} />
                     {isEmailError && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
                 </div>
 
@@ -74,9 +67,7 @@ export default function ContactMethod({ email, phone, onEmailChange, onPhoneChan
             </div>
 
             {/* Helper text */}
-            <p className="text-xs text-muted-foreground text-center">
-                Provide at least one contact method. You can add both if you'd like.
-            </p>
+            <p className="text-xs text-muted-foreground text-center">Provide at least one contact method. You can add both if you'd like.</p>
         </div>
     );
 }

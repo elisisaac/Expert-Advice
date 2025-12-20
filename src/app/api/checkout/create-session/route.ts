@@ -18,8 +18,11 @@ export async function POST(req: Request) {
 
         const priceId = interval === 'yearly' ? plan.stripePriceId.yearly : plan.stripePriceId.monthly;
 
-        const session = await stripe.checkout.sessions.create({
-            customer_email: user.user?.email,
+        // Check if user already has a subscription record
+        const { data: existingSubscription } = await supabase.from('subscriptions').select('stripe_customer_id, stripe_subscription_id, status, plan_key').eq('user_id', userId).single();
+
+        // Build checkout session parameters
+        const sessionParams: any = {
             line_items: [
                 {
                     price: priceId,
@@ -34,7 +37,16 @@ export async function POST(req: Request) {
                 planKey: plan.key,
                 interval: interval,
             },
-        });
+        };
+
+        // Use existing customer ID if available, otherwise use email to create new customer
+        if (existingSubscription?.stripe_customer_id) {
+            sessionParams.customer = existingSubscription.stripe_customer_id;
+        } else {
+            sessionParams.customer_email = user.user?.email;
+        }
+
+        const session = await stripe.checkout.sessions.create(sessionParams);
 
         return NextResponse.json({ url: session.url });
     } catch (error: any) {

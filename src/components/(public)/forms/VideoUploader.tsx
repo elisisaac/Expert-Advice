@@ -59,7 +59,9 @@ export default function VideoUploader({ videoUrl, isUploading, onUploadStart, on
 
             await uploadWithProgress(bucketName, fileName, file);
 
-            const { data: { publicUrl } } = supabaseClient.storage.from(bucketName).getPublicUrl(fileName);
+            const {
+                data: { publicUrl },
+            } = supabaseClient.storage.from(bucketName).getPublicUrl(fileName);
 
             setUploadProgress(100);
             onUploadComplete({ url: publicUrl, path: fileName, fileSubmissionId });
@@ -234,21 +236,14 @@ export default function VideoUploader({ videoUrl, isUploading, onUploadStart, on
                                 onDragLeave={onDragLeave}
                                 onClick={() => uploadInputRef.current?.click()}
                                 className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-all duration-200 cursor-pointer
-                                    ${isDragging
-                                        ? 'border-indigo-600 bg-indigo-500/20 scale-[1.02] shadow-lg shadow-indigo-500/20'
-                                        : error
-                                            ? 'border-red-500/50 bg-red-500/10 hover:border-red-500/50'
-                                            : 'border-border bg-muted/30 hover:border-indigo-500/50 hover:bg-muted'
-                                    }`}
+                                    ${isDragging ? 'border-indigo-600 bg-indigo-500/20 scale-[1.02] shadow-lg shadow-indigo-500/20' : error ? 'border-red-500/50 bg-red-500/10 hover:border-red-500/50' : 'border-border bg-muted/30 hover:border-indigo-500/50 hover:bg-muted'}`}
                             >
                                 <div className="flex flex-col items-center gap-3">
                                     <div className={`p-3 rounded-full transition-colors border border-border ${isDragging ? 'bg-indigo-600' : error ? 'bg-red-500/20' : 'bg-muted'}`}>
                                         <Upload className={`w-6 h-6 ${isDragging ? 'text-white' : error ? 'text-red-500' : 'text-indigo-500 dark:text-indigo-400'}`} />
                                     </div>
                                     <div>
-                                        <p className={`font-semibold text-base mb-1 ${error ? 'text-red-600 dark:text-red-400' : isDragging ? 'text-indigo-600 dark:text-indigo-400' : 'text-foreground'}`}>
-                                            {error ? 'Error: Click to Retry' : isDragging ? 'Drop Here' : 'Click to Upload'}
-                                        </p>
+                                        <p className={`font-semibold text-base mb-1 ${error ? 'text-red-600 dark:text-red-400' : isDragging ? 'text-indigo-600 dark:text-indigo-400' : 'text-foreground'}`}>{error ? 'Error: Click to Retry' : isDragging ? 'Drop Here' : 'Click to Upload'}</p>
                                         <p className="text-xs text-muted-foreground">MP4, MOV, WEBM</p>
                                         <p className="text-xs text-muted-foreground mt-0.5">Max {process.env.NEXT_PUBLIC_MAX_VIDEO_SIZE_MB || '50'}MB</p>
                                     </div>
@@ -267,10 +262,7 @@ export default function VideoUploader({ videoUrl, isUploading, onUploadStart, on
                             </div>
 
                             {/* Record Box */}
-                            <div
-                                onClick={() => setSelectedSource('record')}
-                                className="relative border-2 border-dashed rounded-xl p-6 text-center transition-all duration-200 cursor-pointer border-border bg-muted/30 hover:border-indigo-500/50 hover:bg-muted"
-                            >
+                            <div onClick={() => setSelectedSource('record')} className="relative border-2 border-dashed rounded-xl p-6 text-center transition-all duration-200 cursor-pointer border-border bg-muted/30 hover:border-indigo-500/50 hover:bg-muted">
                                 <div className="flex flex-col items-center gap-3">
                                     <div className="p-3 rounded-full transition-colors border border-border bg-muted">
                                         <Camera className="w-6 h-6 text-indigo-500 dark:text-indigo-400" />

@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Database, FileText, Send, Mic, Video } from 'lucide-react';
+import { Database, FileText, Send, Mic, Video, BarChart } from 'lucide-react';
 
 interface UsageData {
     storage: { used: number; limit: number; percentage: number };
@@ -36,7 +36,7 @@ function QuotaItem({ icon: Icon, label, used, limit, unlimited, percentage, unit
                         </>
                     ) : (
                         <>
-                            {used.toFixed(unit === ' GB' ? 2 : 0)}
+                            {(used || 0).toFixed(unit === ' GB' ? 2 : Number.isInteger(used) ? 0 : 2)}
                             {unit} / {limit}
                             {unit}
                         </>
@@ -50,9 +50,9 @@ function QuotaItem({ icon: Icon, label, used, limit, unlimited, percentage, unit
 
 export function UsageQuotaCard({ usage }: UsageQuotaCardProps) {
     return (
-        <Card className="bg-card border border-border shadow-xl">
-            <CardHeader className="border-b border-white/5 pb-4">
-                <CardTitle className="text-lg font-medium text-foreground">Usage & Quotas</CardTitle>
+        <Card className="bg-card border border-border shadow-sm flex flex-col h-full ">
+            <CardHeader className="border-b pb-4">
+                <CardTitle className="text-lg font-bold text-foreground">Usage & Quotas</CardTitle>
             </CardHeader>
             <CardContent className="p-6 space-y-6">
                 <QuotaItem icon={Database} label="Storage" used={usage.storage.used / (1024 * 1024 * 1024)} limit={usage.storage.limit / (1024 * 1024 * 1024)} percentage={usage.storage.percentage} unit=" GB" />

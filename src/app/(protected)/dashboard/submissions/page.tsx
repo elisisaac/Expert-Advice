@@ -21,6 +21,7 @@ export default async function SubmissionsPage() {
         data: row.data,
         videoUrl: row.video_url,
         transcript: row.transcript,
+        summary: row.summary,
         jsonResultUrl: row.json_result_url,
         markdownUrl: row.markdown_url,
         status: row.status,

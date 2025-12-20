@@ -6,6 +6,7 @@ export interface SubmissionRow {
     data: Record<string, any>; // jsonb field
     video_url: string | null;
     transcript: string | null;
+    summary: string | null;
     json_result_url: string | null;
     markdown_url: string | null;
     status: SubmissionStatus;
@@ -22,6 +23,7 @@ export interface SubmissionDisplayData {
     data: Record<string, any>;
     videoUrl: string | null;
     transcript: string | null;
+    summary: string | null;
     jsonResultUrl: string | null;
     markdownUrl: string | null;
     status: SubmissionStatus;

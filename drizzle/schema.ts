@@ -60,13 +60,9 @@ export const usage = pgTable(
 
         // Usage tracking fields
         storageUsedBytes: bigint('storage_used_bytes', { mode: 'number' }).default(0).notNull(),
-        audioMinutesTranscribed: numeric('audio_minutes_transcribed', { precision: 10, scale: 2 })
-            .default('0.00')
-            .notNull(),
+        audioMinutesTranscribed: numeric('audio_minutes_transcribed', { precision: 10, scale: 2 }).default('0.00').notNull(),
 
-        videoMinutesUsed: numeric('video_minutes_used', { precision: 10, scale: 2 })
-            .default('0.00')
-            .notNull(),
+        videoMinutesUsed: numeric('video_minutes_used', { precision: 10, scale: 2 }).default('0.00').notNull(),
 
         formsCreatedCount: integer('forms_created_count').default(0).notNull(),
         submissionsCount: integer('submissions_count').default(0).notNull(),
@@ -136,6 +132,7 @@ export const submissions = pgTable(
         videoUrl: text('video_url'), // uploaded by user
         videoUrlPath: text('video_url_path'),
         transcript: text('transcript'), // auto-generated after processing
+        summary: text('summary'), // auto-generated after processing
         jsonResultUrl: text('json_result_url'), // generated structured data
         jsonResultUrlPath: text('json_result_url_path'),
         markdownUrl: text('markdown_url'), // generated markdown summary

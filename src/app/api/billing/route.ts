@@ -4,7 +4,7 @@ import { db } from '@/lib/db/drizzle';
 import { eq } from 'drizzle-orm';
 import { stripe, PLAN_CONFIG, type PlanKey } from '@/lib/stripe/config';
 import type { BillingDisplayData } from '@/lib/types/billing.types';
-import { subscriptions, usage } from '../../../../drizzle/schema';
+import { subscriptions, usage, limits } from '../../../../drizzle/schema';
 
 export async function GET() {
     try {
@@ -29,26 +29,44 @@ export async function GET() {
             where: eq(usage.userId, userId),
         });
 
-        const planConfig = PLAN_CONFIG[userSubscription.planKey as PlanKey];
-        const limits = planConfig.limits;
+        // Query user's actual limits from database
+        const userLimits = await db.query.limits.findFirst({
+            where: eq(limits.userId, userId),
+        });
+
+        // Use 'plan' column as source of truth (plan_key may be outdated)
+        const actualPlan = (userSubscription.plan || userSubscription.planKey) as PlanKey;
+        const planConfig = PLAN_CONFIG[actualPlan];
+
+        // Use database limits if available, fallback to config
+        const actualLimits = userLimits
+            ? {
+                  storage_bytes: Number(userLimits.storageLimitBytes),
+                  forms_limit: userLimits.formsLimit,
+                  submissions_limit: userLimits.submissionsLimit,
+                  audio_minutes: userLimits.audioMinutesLimit,
+                  video_minutes: userLimits.videoMinutesLimit,
+                  video_intelligence: userLimits.videoIntelligenceEnabled,
+              }
+            : planConfig.limits;
 
         const storageUsed = Number(userUsage?.storageUsedBytes || 0);
-        const storageLimit = limits.storage_bytes;
+        const storageLimit = actualLimits.storage_bytes;
         const audioUsed = Number(userUsage?.audioMinutesTranscribed || 0);
-        const audioLimit = limits.audio_minutes;
+        const audioLimit = actualLimits.audio_minutes;
 
         const billingData: BillingDisplayData = {
             subscription: {
-                plan: userSubscription.planKey as PlanKey,
+                plan: actualPlan,
                 planName: planConfig.name,
                 status: userSubscription.status,
-                price: userSubscription.planKey === 'go' ? '$27' : '$69',
+                price: actualPlan === 'go' ? '$27' : '$69',
                 nextBillingDate: userSubscription.subscriptionEnd
                     ? new Date(userSubscription.subscriptionEnd).toLocaleDateString('en-US', {
-                        month: 'long',
-                        day: 'numeric',
-                        year: 'numeric',
-                    })
+                          month: 'long',
+                          day: 'numeric',
+                          year: 'numeric',
+                      })
                     : null,
                 stripeCustomerId: userSubscription.stripeCustomerId,
             },
@@ -60,12 +78,12 @@ export async function GET() {
                 },
                 forms: {
                     used: userUsage?.formsCreatedCount || 0,
-                    limit: limits.forms_limit,
+                    limit: actualLimits.forms_limit,
                     unlimited: false,
                 },
                 submissions: {
                     used: userUsage?.submissionsCount || 0,
-                    limit: limits.submissions_limit,
+                    limit: actualLimits.submissions_limit,
                     unlimited: false,
                 },
                 audioMinutes: {
@@ -77,9 +95,9 @@ export async function GET() {
             invoices: [],
         };
 
-        if ((limits as any).video_intelligence) {
-            const videoUsed = userUsage?.videoMinutesUsed || 0;
-            const videoLimit = (limits as any).video_minutes;
+        if (actualLimits.video_intelligence) {
+            const videoUsed = Number(userUsage?.videoMinutesUsed || 0);
+            const videoLimit = actualLimits.video_minutes;
             billingData.usage!.videoMinutes = {
                 used: videoUsed,
                 limit: videoLimit,
@@ -91,7 +109,7 @@ export async function GET() {
             try {
                 const stripeInvoices = await stripe.invoices.list({
                     customer: userSubscription.stripeCustomerId,
-                    limit: 10,
+                    limit: 5,
                 });
 
                 billingData.invoices = stripeInvoices.data.map((invoice) => ({

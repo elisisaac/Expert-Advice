@@ -39,10 +39,10 @@ export function PricingCard({ plan, isYearly, yearlyDiscountPercent, onSelectPla
 
             <div className="mb-6">
                 <div className="flex items-baseline gap-2">
-                    <span className="text-5xl font-bold">${displayPrice.toFixed(0)}</span>
+                    <span className="text-5xl font-bold">${displayPrice % 1 === 0 ? displayPrice.toFixed(0) : displayPrice.toFixed(2)}</span>
                     <span className="text-muted-foreground">/{isYearly ? 'year' : 'month'}</span>
                 </div>
-                {isYearly && <p className="text-sm text-green-500 mt-1">Save ${(plan.price.monthly * 12 - displayPrice * 12).toFixed(0)}/year</p>}
+                {isYearly && <p className="text-sm text-green-500 mt-1">Save ${(plan.price.monthly * 12 - displayPrice * 12).toFixed(2)}/year</p>}
             </div>
 
             <ul className="space-y-3 mb-8">

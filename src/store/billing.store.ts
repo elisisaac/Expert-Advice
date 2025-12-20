@@ -51,7 +51,21 @@ export const useBillingStore = create<BillingState>((set) => ({
                 return;
             }
 
-            // Don't reset loading state - user is being redirected
+            // Check if subscription was upgraded directly (no checkout needed)
+            if (data.upgraded) {
+                toast.success(data.message || 'Subscription upgraded successfully!');
+                set({ isCheckoutLoading: false, loadingPlan: null });
+
+                // Refresh billing data to show new plan
+                const billingRes = await fetch('/api/billing');
+                if (billingRes.ok) {
+                    const billingData = await billingRes.json();
+                    set({ billingData });
+                }
+                return;
+            }
+
+            // Otherwise redirect to checkout (for new customers)
             window.location.href = data.url;
         } catch (error) {
             toast.error('Failed to start checkout');
