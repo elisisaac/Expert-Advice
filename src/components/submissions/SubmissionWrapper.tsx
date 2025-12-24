@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import SubmissionsTable from './SubmissionsTable';
-import { Search, Filter, Download, Send } from 'lucide-react';
+import { Search, Send } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { SubmissionDisplayData } from '@/lib/types/submission.types';
 import { useSubmissionsStore } from '@/store/submissions.store';
 
