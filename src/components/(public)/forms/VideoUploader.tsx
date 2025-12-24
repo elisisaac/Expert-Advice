@@ -11,8 +11,8 @@ import { toast } from 'sonner';
 const VideoRecorder = dynamic(() => import('./VideoRecorder'), {
     ssr: false,
     loading: () => (
-        <div className="flex items-center justify-center aspect-video bg-[#1A1A1A] rounded-xl border border-white/10">
-            <div className="text-gray-400 flex items-center gap-2">
+        <div className="flex items-center justify-center aspect-video bg-muted rounded-xl border border-border">
+            <div className="text-muted-foreground flex items-center gap-2">
                 <Loader2 className="w-5 h-5 animate-spin" />
                 Loading camera...
             </div>
@@ -24,7 +24,7 @@ interface VideoUploaderProps {
     videoUrl: string;
     isUploading: boolean;
     onUploadStart: () => void;
-    onUploadComplete: (url: string) => void;
+    onUploadComplete: (data: { url: string; path: string; fileSubmissionId: string }) => void;
     onUploadError: (error: string) => void;
     formId: string;
 }
@@ -52,8 +52,9 @@ export default function VideoUploader({ videoUrl, isUploading, onUploadStart, on
             setUploadProgress(0);
             setCurrentFileName(file.name);
 
+            const fileSubmissionId = crypto.randomUUID();
             const fileExt = file.name.split('.').pop();
-            const fileName = `${formId}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+            const fileName = `${formId}/${fileSubmissionId}/video.${fileExt}`;
             const bucketName = process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET!;
 
             await uploadWithProgress(bucketName, fileName, file);
@@ -63,7 +64,7 @@ export default function VideoUploader({ videoUrl, isUploading, onUploadStart, on
             } = supabaseClient.storage.from(bucketName).getPublicUrl(fileName);
 
             setUploadProgress(100);
-            onUploadComplete(publicUrl);
+            onUploadComplete({ url: publicUrl, path: fileName, fileSubmissionId });
             toast.success('Video uploaded successfully!');
         } catch (err: any) {
             console.error('Upload error:', err);
@@ -113,7 +114,7 @@ export default function VideoUploader({ videoUrl, isUploading, onUploadStart, on
         });
     }
 
-    function handleFile(f?: FileList) {
+    async function handleFile(f?: FileList) {
         setError(null);
         if (!f || f.length === 0) return;
         const file = f[0];
@@ -133,6 +134,35 @@ export default function VideoUploader({ videoUrl, isUploading, onUploadStart, on
             setError(errorMsg);
             toast.error(errorMsg);
             return;
+        }
+
+        try {
+            const { data: formData } = await supabaseClient.from('forms').select('user_id').eq('id', formId).single();
+
+            if (formData?.user_id) {
+                const storageCheck = await fetch('/api/check-storage', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: formData.user_id, fileSize: file.size }),
+                });
+
+                const { allowed, current, limit } = await storageCheck.json();
+
+                if (!allowed) {
+                    const currentGB = (current / 1024 / 1024 / 1024).toFixed(1);
+                    const limitGB = (limit / 1024 / 1024 / 1024).toFixed(0);
+                    const fileSizeMB = (file.size / 1024 / 1024).toFixed(1);
+                    const remainingMB = ((limit - current) / 1024 / 1024).toFixed(0);
+                    const wouldBeGB = ((current + file.size) / 1024 / 1024 / 1024).toFixed(1);
+
+                    const errorMsg = `This form's storage is full. Currently using ${currentGB}GB of ${limitGB}GB. Your ${fileSizeMB}MB video would bring the total to ${wouldBeGB}GB. Only ${remainingMB}MB space remaining. Please record a shorter video or contact the form owner.`;
+                    setError(errorMsg);
+                    toast.error(errorMsg, { duration: 8000 });
+                    return;
+                }
+            }
+        } catch (err) {
+            console.error('Storage check failed:', err);
         }
 
         uploadToSupabase(file);
@@ -155,7 +185,7 @@ export default function VideoUploader({ videoUrl, isUploading, onUploadStart, on
     }
 
     function removeVideo() {
-        onUploadComplete('');
+        onUploadComplete({ url: '', path: '', fileSubmissionId: '' });
         setError(null);
         setCurrentFileName('');
         setUploadProgress(0);
@@ -183,98 +213,94 @@ export default function VideoUploader({ videoUrl, isUploading, onUploadStart, on
         <div className="space-y-4">
             {!videoUrl ? (
                 <>
-                    <div
-                        onDrop={onDrop}
-                        onDragOver={onDragOver}
-                        onDragLeave={onDragLeave}
-                        onClick={() => !isUploading && uploadInputRef.current?.click()}
-                        className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200 
-                            ${
-                                isUploading
-                                    ? 'border-indigo-600 bg-indigo-950/20 cursor-not-allowed'
-                                    : isDragging
-                                      ? 'border-indigo-600 bg-indigo-950/30 scale-[1.01] cursor-pointer shadow-lg shadow-indigo-500/20'
-                                      : error
-                                        ? 'border-red-600/50 bg-red-950/10 hover:border-red-500/50 cursor-pointer'
-                                        : 'border-white/10 bg-white/5 hover:border-indigo-500/50 hover:bg-white/10 cursor-pointer'
-                            }`}
-                    >
-                        {isUploading && (
-                            <div className="absolute inset-0 flex flex-col items-center justify-center p-4 bg-[#0A0A0A]/90 backdrop-blur-sm rounded-xl">
-                                <Loader2 className="w-10 h-10 text-indigo-400 animate-spin mb-3" />
-                                <p className="text-lg font-semibold text-white mb-2">Uploading...</p>
-                                <p className="text-sm text-gray-400 mb-4 truncate w-full px-2">{currentFileName}</p>
-                                <div className="w-3/4 h-2 bg-white/10 rounded-full overflow-hidden">
+                    {isUploading && (
+                        <div className="border-2 border-indigo-600 bg-indigo-500/10 rounded-xl p-6 transition-all duration-200">
+                            <div className="flex flex-col items-center justify-center">
+                                <Loader2 className="w-10 h-10 text-indigo-500 dark:text-indigo-400 animate-spin mb-3" />
+                                <p className="text-lg font-semibold text-foreground mb-2">Uploading...</p>
+                                <p className="text-sm text-muted-foreground mb-4 truncate w-full px-2 text-center">{currentFileName}</p>
+                                <div className="w-3/4 h-2 bg-muted rounded-full overflow-hidden">
                                     <div className="h-full bg-indigo-500 transition-all duration-300" style={{ width: `${uploadProgress}%` }} />
                                 </div>
-                                <span className="text-sm font-semibold text-indigo-400 mt-2">{uploadProgress}% Complete</span>
+                                <span className="text-sm font-semibold text-indigo-500 dark:text-indigo-400 mt-2">{uploadProgress}% Complete</span>
                             </div>
-                        )}
+                        </div>
+                    )}
 
-                        <div className="flex flex-col items-center gap-4 opacity-100">
+                    {!isUploading && (
+                        <div className="relative grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {/* Upload Box */}
                             <div
-                                className={`p-4 rounded-full transition-colors border border-white/20 
-                                ${isDragging ? 'bg-indigo-600' : error ? 'bg-red-900/40' : 'bg-white/10'}`}
+                                onDrop={onDrop}
+                                onDragOver={onDragOver}
+                                onDragLeave={onDragLeave}
+                                onClick={() => uploadInputRef.current?.click()}
+                                className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-all duration-200 cursor-pointer
+                                    ${isDragging ? 'border-indigo-600 bg-indigo-500/20 scale-[1.02] shadow-lg shadow-indigo-500/20' : error ? 'border-red-500/50 bg-red-500/10 hover:border-red-500/50' : 'border-border bg-muted/30 hover:border-indigo-500/50 hover:bg-muted'}`}
                             >
-                                <Upload className={`w-8 h-8 ${isDragging ? 'text-white' : error ? 'text-red-400' : 'text-indigo-400'}`} />
+                                <div className="flex flex-col items-center gap-3">
+                                    <div className={`p-3 rounded-full transition-colors border border-border ${isDragging ? 'bg-indigo-600' : error ? 'bg-red-500/20' : 'bg-muted'}`}>
+                                        <Upload className={`w-6 h-6 ${isDragging ? 'text-white' : error ? 'text-red-500' : 'text-indigo-500 dark:text-indigo-400'}`} />
+                                    </div>
+                                    <div>
+                                        <p className={`font-semibold text-base mb-1 ${error ? 'text-red-600 dark:text-red-400' : isDragging ? 'text-indigo-600 dark:text-indigo-400' : 'text-foreground'}`}>{error ? 'Error: Click to Retry' : isDragging ? 'Drop Here' : 'Click to Upload'}</p>
+                                        <p className="text-xs text-muted-foreground">MP4, MOV, WEBM</p>
+                                        <p className="text-xs text-muted-foreground mt-0.5">Max {process.env.NEXT_PUBLIC_MAX_VIDEO_SIZE_MB || '50'}MB</p>
+                                    </div>
+                                </div>
+                                <input ref={uploadInputRef} onChange={(e) => handleFile(e.target.files || undefined)} accept="video/*" type="file" className="hidden" />
                             </div>
 
-                            <div>
-                                <p className={`text-lg font-semibold mb-1 ${error ? 'text-red-400' : isDragging ? 'text-indigo-300' : 'text-white'}`}>{error ? 'Error: Click to Retry' : isDragging ? 'Drop video here to upload' : 'Drag & Drop or Click to Upload'}</p>
+                            {/* OR Divider */}
+                            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden sm:flex items-center justify-center z-10">
+                                <div className="bg-card px-3 py-1.5 rounded-full border border-border shadow-sm">
+                                    <span className="text-sm font-semibold text-muted-foreground">OR</span>
+                                </div>
+                            </div>
+                            <div className="sm:hidden flex items-center justify-center -my-2">
+                                <span className="bg-card px-3 py-1 rounded-full border border-border text-xs font-semibold text-muted-foreground">OR</span>
+                            </div>
 
-                                <p className="text-sm text-gray-400">MP4, MOV, WEBM formats supported.</p>
-                                <p className="text-xs text-gray-500 mt-1">Max video size: {process.env.NEXT_PUBLIC_MAX_VIDEO_SIZE_MB || '50'}MB</p>
+                            {/* Record Box */}
+                            <div onClick={() => setSelectedSource('record')} className="relative border-2 border-dashed rounded-xl p-6 text-center transition-all duration-200 cursor-pointer border-border bg-muted/30 hover:border-indigo-500/50 hover:bg-muted">
+                                <div className="flex flex-col items-center gap-3">
+                                    <div className="p-3 rounded-full transition-colors border border-border bg-muted">
+                                        <Camera className="w-6 h-6 text-indigo-500 dark:text-indigo-400" />
+                                    </div>
+                                    <div>
+                                        <p className="font-semibold text-base mb-1 text-foreground">Record Now</p>
+                                        <p className="text-xs text-muted-foreground">Use your camera</p>
+                                        <p className="text-xs text-muted-foreground mt-0.5">Instant capture</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <input ref={uploadInputRef} onChange={(e) => handleFile(e.target.files || undefined)} accept="video/*" type="file" className="hidden" disabled={isUploading} />
-                    </div>
-
-                    <div className="relative my-6">
-                        <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-white/10" />
-                        </div>
-                        <div className="relative flex justify-center text-sm">
-                            <span className="px-3 bg-[#0A0A0A] text-gray-500 font-medium">OR</span>
-                        </div>
-                    </div>
-
-                    <Button type="button" onClick={() => setSelectedSource('record')} className="w-full h-auto py-3 border border-indigo-500/20 bg-indigo-600/10 hover:bg-indigo-600/20 transition-all text-white rounded-xl shadow-md shadow-indigo-900/30">
-                        <div className="flex items-center gap-4">
-                            <div className="p-2 bg-indigo-500/30 rounded-lg">
-                                <Camera className="w-5 h-5 text-indigo-300" />
-                            </div>
-                            <div className="text-left flex-1">
-                                <p className="font-semibold text-white">Record Video Directly</p>
-                                <p className="text-xs text-gray-400">Capture footage using your device camera for instant upload.</p>
-                            </div>
-                            <Zap className="w-5 h-5 text-indigo-400 shrink-0" />
-                        </div>
-                    </Button>
+                    )}
                 </>
             ) : (
-                <div className="border border-green-500/30 bg-green-950/20 rounded-xl p-5 transition-all duration-200 shadow-lg shadow-green-900/20">
+                <div className="border border-green-500/30 bg-green-500/10 rounded-xl p-5 transition-all duration-200 shadow-lg">
                     <div className="flex items-start gap-4">
-                        <div className="p-3 bg-green-600/30 rounded-lg">
-                            <VideoIcon className="w-6 h-6 text-green-400" />
+                        <div className="p-3 bg-green-500/20 rounded-lg">
+                            <VideoIcon className="w-6 h-6 text-green-600 dark:text-green-400" />
                         </div>
                         <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-3">
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 mb-1">
-                                        <CheckCircle2 className="w-4 h-4 text-green-400 shrink-0" />
-                                        <p className="font-semibold text-base text-white">Video Ready</p>
+                                        <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400 shrink-0" />
+                                        <p className="font-semibold text-base text-foreground">Video Ready</p>
                                     </div>
-                                    <p className="text-xs text-gray-400 truncate">{currentFileName || 'Video uploaded successfully'}</p>
+                                    <p className="text-xs text-muted-foreground truncate">{currentFileName || 'Video uploaded successfully'}</p>
                                 </div>
-                                <button type="button" onClick={removeVideo} disabled={isUploading} className="p-1.5 hover:bg-white/10 rounded-lg transition-colors shrink-0 text-gray-500 hover:text-red-400" aria-label="Remove video">
+                                <button type="button" onClick={removeVideo} disabled={isUploading} className="p-1.5 hover:bg-muted rounded-lg transition-colors shrink-0 text-muted-foreground hover:text-red-500" aria-label="Remove video">
                                     <X className="w-4 h-4" />
                                 </button>
                             </div>
                             <div className="mt-2.5 flex items-center gap-2">
-                                <div className="flex-1 h-1 bg-green-200/20 rounded-full overflow-hidden">
-                                    <div className="h-full bg-green-600 w-full transition-all duration-500" />
+                                <div className="flex-1 h-1 bg-green-500/20 rounded-full overflow-hidden">
+                                    <div className="h-full bg-green-600 dark:bg-green-500 w-full transition-all duration-500" />
                                 </div>
-                                <span className="text-xs font-medium text-green-400">100%</span>
+                                <span className="text-xs font-medium text-green-600 dark:text-green-400">100%</span>
                             </div>
                         </div>
                     </div>

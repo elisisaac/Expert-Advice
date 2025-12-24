@@ -2,13 +2,18 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, FileText, Send, CreditCard, Settings, HelpCircle, LogOut, Ghost } from 'lucide-react';
+import { LayoutDashboard, FileText, Send, CreditCard, HelpCircle, LogOut, Ghost, Shield } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { supabaseClient } from '@/supabase/client';
 
-export default function Sidebar({ isCollapsed, onToggle }: { isCollapsed: boolean; onToggle: () => void }) {
+interface SidebarProps {
+    isCollapsed: boolean;
+    onToggle: () => void;
+    isAdmin: boolean;
+}
+
+export default function Sidebar({ isCollapsed, onToggle, isAdmin }: SidebarProps) {
     const pathname = usePathname();
     const router = useRouter();
 
@@ -23,11 +28,15 @@ export default function Sidebar({ isCollapsed, onToggle }: { isCollapsed: boolea
         { icon: FileText, label: 'Forms', href: '/dashboard/forms' },
         { icon: Send, label: 'Submissions', href: '/dashboard/submissions' },
         { icon: CreditCard, label: 'Billings', href: '/dashboard/billings' },
-        { icon: Settings, label: 'Settings', href: '/dashboard/settings' },
+        // { icon: Settings, label: 'Settings', href: '/dashboard/settings' },
     ];
 
+    if (isAdmin) {
+        mainItems.push({ icon: Shield, label: 'Admin', href: '/dashboard/admin' });
+    }
+
     const bottomItems = [
-        { icon: HelpCircle, label: 'Help & Information', href: '/dashboard/help' },
+        { icon: HelpCircle, label: 'Help & Information', href: '/contact' },
         { icon: LogOut, label: 'Log out', onClick: handleLogout },
     ];
 
@@ -75,7 +84,7 @@ export default function Sidebar({ isCollapsed, onToggle }: { isCollapsed: boolea
                     <div className="mt-auto space-y-2 pt-4 border-t border-sidebar-border">
                         {bottomItems.map((item) =>
                             item.onClick ? (
-                                <button key={item.label} onClick={item.onClick} className={cn('flex w-full items-center gap-3 p-3 rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors group relative', isCollapsed && 'justify-center')}>
+                                <button key={item.label} onClick={item.onClick} className={cn('flex w-full items-center gap-3 p-3 rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors group relative cursor-pointer', isCollapsed && 'justify-center')}>
                                     <item.icon className="w-5 h-5 shrink-0" />
                                     {!isCollapsed && <span className="font-medium whitespace-nowrap transition-opacity duration-200">{item.label}</span>}
                                     {isCollapsed && <div className="absolute left-full ml-4 px-2 py-1 bg-popover text-popover-foreground text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50 border border-border shadow-md">{item.label}</div>}
