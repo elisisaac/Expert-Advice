@@ -167,7 +167,7 @@ export default function SubmissionsTable({ search = '' }: { search?: string }) {
 
                                                 <td className="px-4 sm:px-6 py-4 sm:py-5 text-right" onClick={(e) => e.stopPropagation()}>
                                                     <div className="flex justify-end items-center gap-1 sm:gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                                                        {!sub.videoSummary && <ProcessAIButton submissionId={sub.id} videoUrl={sub.videoUrl} />}
+                                                        {!sub.videoSummary && <ProcessAIButton submissionId={sub.id} />}
                                                         <DeleteSubmissionButton submissionId={sub.id} videoUrl={sub.videoUrl} jsonResultUrl={sub.jsonResultUrl} markdownUrl={sub.markdownUrl} />
                                                     </div>
                                                 </td>
