@@ -86,7 +86,8 @@ export function UpgradeSection({ yearlyDiscountPercent }: UpgradeSectionProps) {
                         <div className="space-y-1">
                             <p className="text-sm font-semibold text-foreground">How to upgrade</p>
                             <p className="text-xs text-muted-foreground leading-relaxed">
-                                Click the <span className="font-semibold text-indigo-600 dark:text-indigo-400">"Manage Subscription"</span> button in your Current Plan card above. You'll be redirected to the Stripe billing portal where you can upgrade your plan, update payment methods, and manage all subscription settings.
+                                Click the <span className="font-semibold text-indigo-600 dark:text-indigo-400">"Manage Subscription"</span> button in your Current Plan card above. You'll be redirected to the Stripe billing portal where you can upgrade your plan, update payment methods, and manage
+                                all subscription settings.
                             </p>
                         </div>
                     </div>

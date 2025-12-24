@@ -6,8 +6,6 @@ import { eq } from 'drizzle-orm';
 
 interface ProcessAIRequest {
     submissionId: string;
-    filesSubmissionId: string;
-    videoUrl: string;
 }
 
 export async function POST(req: Request) {
@@ -22,13 +20,24 @@ export async function POST(req: Request) {
         }
 
         const body: ProcessAIRequest = await req.json();
-        const { submissionId, filesSubmissionId, videoUrl } = body;
+        const { submissionId } = body;
 
-        if (!submissionId || !filesSubmissionId || !videoUrl) {
-            return NextResponse.json({ error: 'Missing required fields: submissionId, filesSubmissionId, videoUrl' }, { status: 400 });
+        if (!submissionId) {
+            return NextResponse.json({ error: 'Missing required field: submissionId' }, { status: 400 });
         }
 
         const userId = user.id;
+
+        // Fetch submission data to get formId, filesSubmissionId, and videoUrl
+        const { data: submission } = await supabase.from('submissions').select('form_id, files_submission_id, video_url').eq('id', submissionId).eq('user_id', userId).single();
+
+        if (!submission) {
+            return NextResponse.json({ error: 'Submission not found' }, { status: 404 });
+        }
+
+        if (!submission.video_url) {
+            return NextResponse.json({ error: 'No video available for this submission' }, { status: 400 });
+        }
 
         const [userSubscription, userLimits, userUsage] = await Promise.all([
             db.query.subscriptions.findFirst({
@@ -82,12 +91,6 @@ export async function POST(req: Request) {
             );
         }
 
-        const { data: submission } = await supabase.from('submissions').select('form_id').eq('id', submissionId).eq('user_id', userId).single();
-
-        if (!submission) {
-            return NextResponse.json({ error: 'Submission not found' }, { status: 404 });
-        }
-
         const n8nWebhookUrl = process.env.N8N_VIDEO_ANALYSIS_URL;
 
         if (!n8nWebhookUrl) {
@@ -104,8 +107,8 @@ export async function POST(req: Request) {
                 body: JSON.stringify({
                     formId: submission.form_id,
                     userId,
-                    fileSubmissionId: filesSubmissionId,
-                    videoUrl,
+                    fileSubmissionId: submission.files_submission_id,
+                    videoUrl: submission.video_url,
                 }),
             });
 

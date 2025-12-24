@@ -6,20 +6,13 @@ import { toast } from 'sonner';
 
 interface ProcessAIButtonProps {
     submissionId: string;
-    videoUrl: string | null;
 }
 
-export default function ProcessAIButton({ submissionId, videoUrl }: ProcessAIButtonProps) {
+export default function ProcessAIButton({ submissionId }: ProcessAIButtonProps) {
     const [isProcessing, setIsProcessing] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
 
     const handleProcess = async () => {
-        if (!videoUrl) {
-            toast.error('No video available to process');
-            setIsOpen(false);
-            return;
-        }
-
         setIsProcessing(true);
 
         try {
@@ -30,8 +23,6 @@ export default function ProcessAIButton({ submissionId, videoUrl }: ProcessAIBut
                 },
                 body: JSON.stringify({
                     submissionId,
-                    filesSubmissionId: submissionId,
-                    videoUrl,
                 }),
             });
 
@@ -66,7 +57,7 @@ export default function ProcessAIButton({ submissionId, videoUrl }: ProcessAIBut
     return (
         <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
             <AlertDialogTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-violet-500 hover:text-violet-400 hover:bg-violet-500/10 transition-all" disabled={!videoUrl}>
+                <Button variant="ghost" size="icon" className="text-violet-500 hover:text-violet-400 hover:bg-violet-500/10 transition-all">
                     <Sparkles className="w-4 h-4" />
                 </Button>
             </AlertDialogTrigger>
